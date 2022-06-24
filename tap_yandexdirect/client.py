@@ -5,6 +5,8 @@ from pathlib import Path
 from typing import Any, Dict, Optional, Union, List, Iterable
 
 from memoization import cached
+from singer_sdk.authenticators import BearerTokenAuthenticator
+from singer_sdk.exceptions import FatalAPIError
 
 from singer_sdk.helpers.jsonpath import extract_jsonpath
 from singer_sdk.streams import RESTStream
@@ -18,17 +20,16 @@ SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 class YandexDirectStream(RESTStream):
     """YandexDirect stream class."""
 
-    # TODO: Set the API's base URL here:
-    url_base = "https://api-sandbox.direct.yandex.com/json/v5/"
+    url_base = "https://api-sandbox.direct.yandex.com/json/v5"
 
-    records_jsonpath = "$[*]"  # Or override `parse_response`.
+    records_jsonpath = "$.result[*]"  # Or override `parse_response`.
     next_page_token_jsonpath = "$.next_page"  # Or override `get_next_page_token`.
 
     @property
     @cached
-    def authenticator(self) -> YandexDirectAuthenticator:
-        """Return a new authenticator object."""
-        return YandexDirectAuthenticator.create_for_stream(self)
+    def authenticator(self) -> BearerTokenAuthenticator:
+        token = self.config.get("access_token")
+        return BearerTokenAuthenticator.create_for_stream(self, token=token)
 
     @property
     def http_headers(self) -> dict:
@@ -75,8 +76,8 @@ class YandexDirectStream(RESTStream):
 
         By default, no payload will be sent (return None).
         """
-        # TODO: Delete this method if no payload is required. (Most REST APIs.)
-        return None
+        data = {"method":"get","params":{"SelectionCriteria":{},"FieldNames":["Id","Name"]}}
+        return data
 
     def parse_response(self, response: requests.Response) -> Iterable[dict]:
         """Parse the response and return an iterator of result rows."""
@@ -87,3 +88,11 @@ class YandexDirectStream(RESTStream):
         """As needed, append or transform raw data to match expected structure."""
         # TODO: Delete this method if not needed.
         return row
+
+    def validate_response(self, response):
+        super().validate_response(response)
+
+        data = response.json()
+        if data.get("error"):
+                raise FatalAPIError(f"Error message found: {data['error']['error_detail']}")
+
