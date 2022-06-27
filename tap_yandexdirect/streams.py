@@ -72,11 +72,6 @@ class AdGroupsStream(YandexDirectStream):
         th.Property("NegativeKeywords", th.StringType)
     ).to_dict()
 
-    # def parse_response(self, response) -> Iterable[dict]:
-    #     """Parse the response and return an iterator of result rows."""
-    #     print("*"*50, response.json())
-    #     yield from extract_jsonpath(self.records_jsonpath, input=response.json())
-
     def prepare_request_payload(
             self, context: Optional[dict], next_page_token: Optional[Any]
     ) -> Optional[dict]:
@@ -129,11 +124,6 @@ class AdsStream(YandexDirectStream):
         th.Property("TextAd", th.StringType)
 
     ).to_dict()
-
-    def parse_response(self, response) -> Iterable[dict]:
-        """Parse the response and return an iterator of result rows."""
-        print("*"*50, response.json())
-        yield from extract_jsonpath(self.records_jsonpath, input=response.json())
 
     def prepare_request_payload(
             self, context: Optional[dict], next_page_token: Optional[Any]
