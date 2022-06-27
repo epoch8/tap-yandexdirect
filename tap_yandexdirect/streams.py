@@ -4,11 +4,14 @@ from pathlib import Path
 from typing import Any, Dict, Optional, Union, List, Iterable
 
 from singer_sdk import typing as th  # JSON Schema typing helpers
+from singer_sdk.helpers.jsonpath import extract_jsonpath
 
 from tap_yandexdirect.client import YandexDirectStream
 
 # TODO: Delete this is if not using json files for schema definition
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
+
+
 # TODO: - Override `UsersStream` and `GroupsStream` with your own stream definition.
 #       - Copy-paste as many times as needed to create multiple stream types.
 
@@ -17,7 +20,7 @@ class CampaignsStream(YandexDirectStream):
     """Define custom stream."""
     name = "campaigns"
     path = "/campaigns"
-    primary_keys = ["id"]
+    primary_keys = ["Id"]
     replication_key = None
     records_jsonpath = "$.result.Campaigns[*]"
     # Optionally, you may also use `schema_filepath` in place of `schema`:
@@ -25,9 +28,133 @@ class CampaignsStream(YandexDirectStream):
     schema = th.PropertiesList(
         th.Property("Name", th.StringType),
         th.Property(
-            "Dd",
+            "Id",
             th.StringType,
             description="The user's system ID"
         )
     ).to_dict()
 
+    def prepare_request_payload(
+            self, context: Optional[dict], next_page_token: Optional[Any]
+    ) -> Optional[dict]:
+        """Prepare the data payload for the REST API request.
+
+        By default, no payload will be sent (return None).
+        """
+        data = {"method": "get", "params": {"SelectionCriteria": {}, "FieldNames": ["Id", "Name", "Status"]}}
+        return data
+
+    def get_child_context(self, record: dict, context: Optional[dict]) -> dict:
+        """Return a context dictionary for child streams."""
+        return {
+            "campaign_id": record["Id"],
+        }
+
+
+class AdGroupsStream(YandexDirectStream):
+    """Define custom stream."""
+    name = "adgroups"
+    path = "/adgroups"
+    primary_keys = ["Id"]
+    replication_key = None
+    rest_method = "POST"
+    records_jsonpath = "$.result.AdGroups[*]"
+    parent_stream_type = CampaignsStream
+    schema = th.PropertiesList(
+        th.Property("Name", th.StringType),
+        th.Property(
+            "Id",
+            th.StringType,
+            description="The user's system ID"
+        ),
+        th.Property("CampaignId", th.StringType),
+        th.Property("Status", th.StringType),
+        th.Property("NegativeKeywords", th.StringType)
+    ).to_dict()
+
+    # def parse_response(self, response) -> Iterable[dict]:
+    #     """Parse the response and return an iterator of result rows."""
+    #     print("*"*50, response.json())
+    #     yield from extract_jsonpath(self.records_jsonpath, input=response.json())
+
+    def prepare_request_payload(
+            self, context: Optional[dict], next_page_token: Optional[Any]
+    ) -> Optional[dict]:
+        """Prepare the data payload for the REST API request.
+
+        By default, no payload will be sent (return None).
+        """
+        data = {
+            "method": "get",
+            "params": {
+                "SelectionCriteria": {
+                    "CampaignIds": [context["campaign_id"]]
+                },
+                "FieldNames": [
+                    "Id",
+                    "Name",
+                    "CampaignId",
+                    "Status",
+                    "RegionIds",
+                    "NegativeKeywords"
+                ]
+            }
+        }
+        return data
+
+    def get_child_context(self, record: dict, context: Optional[dict]) -> dict:
+        """Return a context dictionary for child streams."""
+        return {
+            "adgroup_id": record["Id"],
+        }
+
+
+class AdsStream(YandexDirectStream):
+    """Define custom stream."""
+    name = "ads"
+    path = "/ads"
+    primary_keys = ["Id"]
+    replication_key = None
+    rest_method = "POST"
+    records_jsonpath = "$.result.Ads[*]"
+    parent_stream_type = AdGroupsStream
+    schema = th.PropertiesList(
+        th.Property(
+            "Id",
+            th.StringType,
+            description="The user's system ID"
+        ),
+        th.Property("AdGroupId", th.StringType),
+        th.Property("Type", th.StringType),
+        th.Property("TextAd", th.StringType)
+
+    ).to_dict()
+
+    def parse_response(self, response) -> Iterable[dict]:
+        """Parse the response and return an iterator of result rows."""
+        print("*"*50, response.json())
+        yield from extract_jsonpath(self.records_jsonpath, input=response.json())
+
+    def prepare_request_payload(
+            self, context: Optional[dict], next_page_token: Optional[Any]
+    ) -> Optional[dict]:
+        """Prepare the data payload for the REST API request.
+
+        By default, no payload will be sent (return None).
+        """
+        data = {
+            "method": "get",
+            "params": {
+                "SelectionCriteria": {
+                    "AdGroupIds": [context["adgroup_id"]]
+                },
+                "FieldNames": [
+                    "Id",
+                    "AdGroupId",
+                    "Type",
+                ],
+                "TextAdFieldNames": ["AdImageHash"],
+                "TextAdPriceExtensionFieldNames": ["Price"],
+            }
+        }
+        return data

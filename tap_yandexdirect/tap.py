@@ -8,9 +8,14 @@ from singer_sdk import typing as th  # JSON schema typing helpers
 from tap_yandexdirect.streams import (
     YandexDirectStream,
     CampaignsStream,
+    AdGroupsStream,
+    AdsStream
 )
+
 STREAM_TYPES = [
     CampaignsStream,
+    AdGroupsStream,
+    AdsStream
 ]
 
 

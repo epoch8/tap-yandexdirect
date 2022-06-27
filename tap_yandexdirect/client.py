@@ -76,8 +76,7 @@ class YandexDirectStream(RESTStream):
 
         By default, no payload will be sent (return None).
         """
-        data = {"method":"get","params":{"SelectionCriteria":{},"FieldNames":["Id","Name"]}}
-        return data
+        return None
 
     def parse_response(self, response: requests.Response) -> Iterable[dict]:
         """Parse the response and return an iterator of result rows."""
