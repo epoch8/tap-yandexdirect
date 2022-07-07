@@ -9,13 +9,15 @@ from tap_yandexdirect.streams import (
     YandexDirectStream,
     CampaignsStream,
     AdGroupsStream,
-    AdsStream
+    AdsStream,
+    AdsPerfomanceStream
 )
 
 STREAM_TYPES = [
     CampaignsStream,
     AdGroupsStream,
-    AdsStream
+    AdsStream,
+    AdsPerfomanceStream
 ]
 
 
@@ -33,6 +35,11 @@ class TapYandexDirect(Tap):
         ),
         th.Property(
             "start_date",
+            th.DateTimeType,
+            description="The earliest record date to sync"
+        ),
+        th.Property(
+            "end_date",
             th.DateTimeType,
             description="The earliest record date to sync"
         ),
