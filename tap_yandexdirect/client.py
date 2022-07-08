@@ -7,7 +7,7 @@ from typing import Any, Dict, Optional, Union, List, Iterable
 from memoization import cached
 from requests import JSONDecodeError
 from singer_sdk.authenticators import BearerTokenAuthenticator
-from singer_sdk.exceptions import FatalAPIError
+from singer_sdk.exceptions import FatalAPIError, RetriableAPIError
 
 from singer_sdk.helpers.jsonpath import extract_jsonpath
 from singer_sdk.streams import RESTStream
@@ -75,6 +75,9 @@ class YandexDirectStream(RESTStream):
 
     def validate_response(self, response):
         super().validate_response(response)
+
+        if response.status_code in [201, 202]:
+            raise RetriableAPIError("The report is being generated in offline mode")
         try:
             data = response.json()
             if data.get("error"):
