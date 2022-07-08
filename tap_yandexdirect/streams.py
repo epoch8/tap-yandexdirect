@@ -34,7 +34,7 @@ class CampaignsStream(YandexDirectStream):
     # schema_filepath = SCHEMAS_DIR / "users.json"
     schema = th.PropertiesList(
         th.Property("Name", th.StringType),
-        th.Property("Id", th.StringType, description="The user's system ID"),
+        th.Property("Id", th.IntegerType, description="The user's system ID"),
     ).to_dict()
 
     def prepare_request_payload(
@@ -69,10 +69,9 @@ class AdGroupsStream(YandexDirectStream):
     parent_stream_type = CampaignsStream
     schema = th.PropertiesList(
         th.Property("Name", th.StringType),
-        th.Property("Id", th.StringType, description="The user's system ID"),
-        th.Property("CampaignId", th.StringType),
+        th.Property("Id", th.IntegerType, description="The user's system ID"),
+        th.Property("CampaignId", th.IntegerType),
         th.Property("Status", th.StringType),
-        th.Property("NegativeKeywords", th.StringType),
     ).to_dict()
 
     def prepare_request_payload(
@@ -92,7 +91,6 @@ class AdGroupsStream(YandexDirectStream):
                     "CampaignId",
                     "Status",
                     "RegionIds",
-                    "NegativeKeywords",
                 ],
             },
         }
@@ -116,8 +114,8 @@ class AdsStream(YandexDirectStream):
     records_jsonpath = "$.result.Ads[*]"
     parent_stream_type = AdGroupsStream
     schema = th.PropertiesList(
-        th.Property("Id", th.StringType, description="The user's system ID"),
-        th.Property("AdGroupId", th.StringType),
+        th.Property("Id", th.IntegerType, description="The user's system ID"),
+        th.Property("AdGroupId", th.IntegerType),
         th.Property("Type", th.StringType),
         th.Property("TextAd", th.StringType),
     ).to_dict()
@@ -138,8 +136,6 @@ class AdsStream(YandexDirectStream):
                     "AdGroupId",
                     "Type",
                 ],
-                "TextAdFieldNames": ["AdImageHash"],
-                "TextAdPriceExtensionFieldNames": ["Price"],
             },
         }
         return data
@@ -154,7 +150,7 @@ class AdsPerfomanceStream(YandexDirectStream):
     rest_method = "POST"
     schema = th.PropertiesList(
         th.Property("Date", th.DateType),
-        th.Property("AdId", th.IntegerType),
+        th.Property("AdId", th.StringType),
         th.Property("CampaignId", th.IntegerType),
         th.Property("Impressions", th.IntegerType),
         th.Property("Clicks", th.IntegerType),
