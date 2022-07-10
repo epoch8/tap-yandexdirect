@@ -7,7 +7,7 @@ import pandas as pd
 from pathlib import Path
 from typing import Any, Dict, Optional, Union, List, Iterable
 
-from datetime import datetime
+from datetime import date
 from requests import head
 from singer_sdk import typing as th  # JSON Schema typing helpers
 from singer_sdk.helpers.jsonpath import extract_jsonpath
@@ -186,7 +186,7 @@ class AdsPerfomanceStream(YandexDirectStream):
                     "Cost",
                 ],
                 "OrderBy": [{"Field": "Date"}],
-                "ReportName": f"AdPerfomance-{datetime.now()}",
+                "ReportName": f"AdPerfomance-{date.today()}",
                 "ReportType": "AD_PERFORMANCE_REPORT",
                 "DateRangeType": "CUSTOM_DATE",
                 "Format": "TSV",
