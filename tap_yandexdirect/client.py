@@ -74,6 +74,9 @@ class YandexDirectStream(RESTStream):
         return row
 
     def validate_response(self, response):
+        if response.staus_code == 400:
+            data = response.json()
+            raise FatalAPIError(f"Error message found: {data['error']['error_string']} {data['error']['error_detail']}")
         super().validate_response(response)
 
         if response.status_code in [201, 202]:
