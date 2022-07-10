@@ -17,12 +17,11 @@ from tap_yandexdirect.client import YandexDirectStream
 # TODO: Delete this is if not using json files for schema definition
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 
-PREFIX = "yandex_direct"
 
 class CampaignsStream(YandexDirectStream):
     """Define custom stream."""
 
-    name = f"{PREFIX}_campaigns"
+    name = "campaigns"
     path = "/campaigns"
     primary_keys = ["Id"]
     replication_key = None
@@ -57,7 +56,7 @@ class CampaignsStream(YandexDirectStream):
 class AdGroupsStream(YandexDirectStream):
     """Define custom stream."""
 
-    name = f"{PREFIX}_adgroups"
+    name = "adgroups"
     path = "/adgroups"
     primary_keys = ["Id"]
     replication_key = None
@@ -103,7 +102,7 @@ class AdGroupsStream(YandexDirectStream):
 class AdsStream(YandexDirectStream):
     """Define custom stream."""
 
-    name = f"{PREFIX}_ads"
+    name = "ads"
     path = "/ads"
     primary_keys = ["Id"]
     replication_key = None
@@ -141,7 +140,7 @@ class AdsStream(YandexDirectStream):
 class AdsPerfomanceStream(YandexDirectStream):
     """Define custom stream."""
 
-    name = f"{PREFIX}_ads_perfomance"
+    name = "ads_perfomance"
     path = "/reports"
     replication_key = "Date"
     rest_method = "POST"
