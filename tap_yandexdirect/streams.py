@@ -17,15 +17,12 @@ from tap_yandexdirect.client import YandexDirectStream
 # TODO: Delete this is if not using json files for schema definition
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 
-
-# TODO: - Override `UsersStream` and `GroupsStream` with your own stream definition.
-#       - Copy-paste as many times as needed to create multiple stream types.
-
+PREFIX = "yandex_direct"
 
 class CampaignsStream(YandexDirectStream):
     """Define custom stream."""
 
-    name = "campaigns"
+    name = f"{PREFIX}_campaigns"
     path = "/campaigns"
     primary_keys = ["Id"]
     replication_key = None
@@ -60,7 +57,7 @@ class CampaignsStream(YandexDirectStream):
 class AdGroupsStream(YandexDirectStream):
     """Define custom stream."""
 
-    name = "adgroups"
+    name = f"{PREFIX}_adgroups"
     path = "/adgroups"
     primary_keys = ["Id"]
     replication_key = None
@@ -106,7 +103,7 @@ class AdGroupsStream(YandexDirectStream):
 class AdsStream(YandexDirectStream):
     """Define custom stream."""
 
-    name = "ads"
+    name = f"{PREFIX}_ads"
     path = "/ads"
     primary_keys = ["Id"]
     replication_key = None
@@ -144,7 +141,7 @@ class AdsStream(YandexDirectStream):
 class AdsPerfomanceStream(YandexDirectStream):
     """Define custom stream."""
 
-    name = "ads_perfomance"
+    name = f"{PREFIX}_ads_perfomance"
     path = "/reports"
     replication_key = "Date"
     rest_method = "POST"
