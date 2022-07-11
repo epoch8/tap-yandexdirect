@@ -88,3 +88,6 @@ class YandexDirectStream(RESTStream):
         except JSONDecodeError:
             if 200 <= response.status_code < 300:
                 pass
+    
+    def backoff_max_tries(self) -> int:
+        return 8

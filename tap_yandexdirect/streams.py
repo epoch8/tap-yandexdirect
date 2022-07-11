@@ -195,6 +195,9 @@ class AdsPerfomanceStream(YandexDirectStream):
     def parse_response(self, response: requests.Response) -> Iterable[dict]:
         """Parse the response and return an iterator of result rows."""
         df = pd.read_csv(io.StringIO(response.text), sep='\t')
+        df["AdId"] = df["AdId"].replace("--", 0)
+        df["AdId"] = pd.to_numeric(df["AdId"], downcast="integer")
+        df["AdId"] = df["AdId"].replace(0, None)
         data_str = df.to_json(None, orient='records')
         data = json.loads(data_str)
         yield from data
