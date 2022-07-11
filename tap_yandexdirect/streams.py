@@ -146,7 +146,7 @@ class AdsPerfomanceStream(YandexDirectStream):
     rest_method = "POST"
     schema = th.PropertiesList(
         th.Property("Date", th.DateType),
-        th.Property("AdId", th.StringType),
+        th.Property("AdId", th.IntegerType),
         th.Property("CampaignId", th.IntegerType),
         th.Property("Impressions", th.IntegerType),
         th.Property("Clicks", th.IntegerType),
