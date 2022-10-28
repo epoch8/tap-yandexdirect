@@ -14,7 +14,6 @@ from singer_sdk.helpers.jsonpath import extract_jsonpath
 
 from tap_yandexdirect.client import YandexDirectStream
 
-# TODO: Delete this is if not using json files for schema definition
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 
 
@@ -26,8 +25,6 @@ class CampaignsStream(YandexDirectStream):
     primary_keys = ["Id"]
     replication_key = None
     records_jsonpath = "$.result.Campaigns[*]"
-    # Optionally, you may also use `schema_filepath` in place of `schema`:
-    # schema_filepath = SCHEMAS_DIR / "users.json"
     schema = th.PropertiesList(
         th.Property("Name", th.StringType),
         th.Property("Id", th.IntegerType, description="The user's system ID"),
@@ -36,10 +33,6 @@ class CampaignsStream(YandexDirectStream):
     def prepare_request_payload(
         self, context: Optional[dict], next_page_token: Optional[Any]
     ) -> Optional[dict]:
-        """Prepare the data payload for the REST API request.
-
-        By default, no payload will be sent (return None).
-        """
         data = {
             "method": "get",
             "params": {"SelectionCriteria": {}, "FieldNames": ["Id", "Name", "Status"]},
