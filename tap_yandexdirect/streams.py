@@ -24,6 +24,8 @@ class CampaignsStream(YandexDirectStream):
     path = "/campaigns"
     primary_keys = ["Id"]
     replication_key = None
+    rest_method = "POST"
+
     records_jsonpath = "$.result.Campaigns[*]"
     schema = th.PropertiesList(
         th.Property("Name", th.StringType),
