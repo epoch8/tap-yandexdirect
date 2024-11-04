@@ -84,7 +84,7 @@ class YandexDirectStream(RESTStream):
         try:
             data = response.json()
             if data.get("error"):
-                    raise FatalAPIError(f"Error message found: {data['error']['error_detail']}")
+                raise FatalAPIError(f"Error message found:\n{data['error']}")
         except JSONDecodeError:
             if 200 <= response.status_code < 300:
                 pass
